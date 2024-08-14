@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intrusion Detection System</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #71b7e6, #9b59b6);
+            color: white;
+            font-family: 'Arial', sans-serif;
+        }
+        .btn-send {
+            font-size: 1.5rem;
+            padding: 1rem 2rem;
+            margin: 0 10px;
+            transition: transform 0.3s;
+        }
+        .btn-send:hover {
+            transform: scale(1.1);
+        }
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 2rem;
+            animation: fadeIn 2s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container text-center">
+        <h1>Intrusion Detection System</h1>
+        <button id="attack-button" class="btn btn-danger btn-send">Attack</button>
+        <button id="normal-button" class="btn btn-success btn-send">Normal</button>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#attack-button').click(function() {
+                $.post('/action', { type: 'attack' }, function(response) {
+                    alert(`Record: ${JSON.stringify(response.record, null, 2)}\nPrediction: ${response.prediction}`);
+                });
+            });
+            $('#normal-button').click(function() {
+                $.post('/action', { type: 'normal' }, function(response) {
+                    alert(`Record: ${JSON.stringify(response.record, null, 2)}\nPrediction: ${response.prediction}`);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

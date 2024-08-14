@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitor</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #71b7e6, #9b59b6);
+            color: white;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .alert-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 300px;
+        }
+        .record-container {
+            margin-top: 20px;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
+            padding: 20px;
+        }
+        .card {
+            margin-top: 20px;
+            animation: fadeInUp 1s;
+            background-color: #212529; /* Dark background color */
+            border: 1px solid rgba(255, 255, 255, 0.1); /* White border */
+            border-radius: 10px;
+        }
+        .card-header {
+            background-color: #343a40; /* Dark header background color */
+            color: white;
+            padding: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* White border */
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+        .card-body {
+            padding: 15px;
+        }
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: white; /* Text color */
+        }
+        h1 {
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <h1 class="mt-5">Monitor</h1>
+        <div id="system-accuracy" class="text-center" style="font-size: 23px;">System Accuracy: Loading...</div>
+        <div id="record" class="record-container"></div>
+    </div>
+    <div class="alert-container" id="alert-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script>
+        var socket = io();
+        
+        socket.on('connect', function() {
+            console.log('Connected to server');
+        });
+
+        socket.on('action_event', function(data) {
+            var record = data.record;
+            var prediction = data.prediction;
+            var alertClass = prediction === 'attack' ? 'alert-danger' : 'alert-success';
+            var alertMessage = prediction === 'attack' ? `Alert!! Someone is trying to intrude your server! Type: ${record.attack_type}` : 'Normal activity detected';
+            var alertHtml = `
+                <div class="alert ${alertClass} alert-dismissible fade show animate__animated animate__fadeInRight" role="alert">
+                    <strong>${alertMessage}</strong>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            `;
+            
+            document.getElementById('alert-container').innerHTML = alertHtml;
+            document.getElementById('system-accuracy').innerText = `System Accuracy: ${data.accuracy}%`;
+
+            var recordHtml = `
+                <div class="card">
+                    <div class="card-header">
+                        <strong>Record Details</strong>
+                    </div>
+                    <div class="card-body">
+                        <pre>${JSON.stringify(record, null, 2)}</pre>
+                    </div>
+                </div>
+            `;
+            document.getElementById('record').innerHTML = recordHtml;
+        });
+    </script>
+</body>
+</html>
+
+
+
+
